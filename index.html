@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CK | SOLDE EPARGNE</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #009688;
+      --accent-color: #004D40;
+      --bg-color: #f9fafb;
+      --text-color: #232323;
+      --input-bg: #f7f9fa;
+      --border: #e0e0e0;
+      --shadow: 0 8px 24px rgba(0,0,0,0.08);
+      --radius: 14px;
+      --transition: 0.2s cubic-bezier(.4,0,.2,1);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      letter-spacing: .01em;
+    }
+    .app-container {
+      background: #fff;
+      padding: 36px 28px 30px 28px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 420px;
+      width: 100%;
+      border: 1px solid var(--border);
+      transition: box-shadow var(--transition);
+      position: relative;
+    }
+    h2 {
+      text-align: center;
+      color: var(--primary-color);
+      font-size: 1.5em;
+      margin-bottom: 18px;
+      margin-top: 0;
+      font-weight: 700;
+      letter-spacing: .03em;
+      line-height: 1.2;
+    }
+    h3 {
+      font-size: 1.05em;
+      margin-bottom: 10px;
+      color: var(--accent-color);
+      font-weight: 600;
+    }
+    h4 {
+      font-size: 1em;
+      color: var(--primary-color);
+      margin-bottom: 6px;
+      margin-top: 0;
+      font-weight: 500;
+    }
+    label {
+      display: block;
+      font-size: .96em;
+      margin-bottom: 6px;
+      margin-top: 16px;
+      color: #5e5e5e;
+      font-weight: 500;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      background: var(--input-bg);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      font-size: 16px;
+      transition: border var(--transition), box-shadow var(--transition);
+      font-family: inherit;
+      color: var(--text-color);
+      box-shadow: none;
+    }
+    input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0,150,136,0.05);
+      background: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      margin-top: 10px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      font-weight: 700;
+      font-size: 1em;
+      cursor: pointer;
+      letter-spacing: .04em;
+      transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+      box-shadow: 0 2px 6px rgba(0,150,136,0.06);
+    }
+    button:hover, button:focus {
+      background: var(--accent-color);
+      transform: translateY(-2px) scale(1.02);
+    }
+    .secondary {
+      background: #f4f4f4;
+      color: var(--accent-color);
+      border: 1.5px solid var(--border);
+      margin-top: 8px;
+      font-weight: 600;
+      box-shadow: none;
+    }
+    .secondary:hover, .secondary:focus {
+      background: #e5e5e5;
+      color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    .error, .result {
+      margin-top: 20px;
+      padding: 15px 13px;
+      border-radius: var(--radius);
+      font-size: 15px;
+      display: none;
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(200,0,0,0.04);
+      word-break: break-word;
+      line-height: 1.5;
+    }
+    .error { background: #ffeded; color: #d32f2f; border: 1.5px solid #ffb1b1; }
+    .result { background: #e0f7fa; color: var(--accent-color); border: 1.5px solid #8ee0da; }
+    a {
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: bold;
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      font-size: .97em;
+      letter-spacing: .02em;
+      transition: color var(--transition);
+    }
+    a:hover, a:focus {
+      color: var(--accent-color);
+      text-decoration: underline;
+    }
+    .disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    .docs-block {
+      margin: 15px 0;
+      padding: 14px 12px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: #fcfcfc;
+      transition: box-shadow var(--transition);
+      box-shadow: 0 1px 4px rgba(0,150,136,0.04);
+    }
+    .docs-block a {
+      display: inline-block;
+      background: var(--primary-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      margin-top: 8px;
+      font-size: .97em;
+      font-weight: 600;
+      transition: background var(--transition);
+      text-align: left;
+      margin-right: 4px;
+      border: none;
+    }
+    .docs-block a:hover, .docs-block a:focus {
+      background: var(--accent-color);
+      color: #fff;
+    }
+    @media (max-width: 540px) {
+      .app-container {
+        max-width: 97vw;
+        padding: 18px 3vw 18px 3vw;
+      }
+      h2 { font-size: 1.13em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- Formulaire principal -->
+  <div id="main-form">
+    <h2>
+      COOPEC KWILU<br>
+      <span style="font-size:1.01em; font-weight:600;">SOLDE ÉPARGNE MEMBRE</span>
+    </h2>
+    <label for="code">N° de Compte</label>
+    <input type="text" id="code" placeholder="A123456-78" autocomplete="off" />
+    <label for="password">Mot de passe</label>
+    <input type="password" id="password" maxlength="5" placeholder="5 caractères" autocomplete="off" />
+    <button onclick="sendData()">VÉRIFIER LE SOLDE</button>
+    <button class="secondary" onclick="resetForm()">EFFACER</button>
+    <div class="error" id="error">⚠️ Format invalide : Code ou mot de passe incorrect</div>
+    <div class="result" id="result"></div>
+    <a href="#" onclick="openCreateForm()">🔐 Créer votre mot de passe</a>
+    <a href="#" onclick="openStatementForm()">📄 Demander un relevé d'épargne</a>
+    <a href="#" onclick="openDocumentsForm()">📚 Documents de la Coopec</a>
+  </div>
+
+  <!-- Formulaire création mot de passe -->
+  <div id="create-form" style="display:none;">
+    <h2>🔐 CRÉATION DE MOT DE PASSE</h2>
+    <label for="new-code">N° de Compte</label>
+    <input type="text" id="new-code" placeholder="A123456-78" autocomplete="off" />
+    <label for="new-password">Créer mot de passe</label>
+    <input type="password" id="new-password" maxlength="5" placeholder="5 caractères" autocomplete="off" />
+    <label for="email">Adresse e-mail (facultatif)</label>
+    <input type="email" id="email" placeholder="Adresse e-mail" autocomplete="off" />
+    <button onclick="sendCreation()">ENVOYER</button>
+    <button class="secondary" onclick="closeCreateForm()">RETOUR</button>
+    <div class="error" id="create-error"></div>
+    <div class="result" id="create-result"></div>
+  </div>
+
+  <!-- Formulaire demande de relevé -->
+  <div id="statement-form" style="display:none;">
+    <h2>📄 DEMANDE DE RELEVÉ D'ÉPARGNE</h2>
+    <label for="statement-code">N° de Compte</label>
+    <input type="text" id="statement-code" placeholder="A123456-78" autocomplete="off" />
+    <label for="start-date">Date de départ</label>
+    <input type="date" id="start-date" placeholder="Date de départ" />
+    <label for="end-date">Date de fin</label>
+    <input type="date" id="end-date" placeholder="Date d'arrivée" disabled />
+    <label for="statement-password">Mot de passe</label>
+    <input type="password" id="statement-password" maxlength="5" placeholder="5 caractères" autocomplete="off" />
+    <button onclick="sendStatement()">ENVOYER LA DEMANDE</button>
+    <button class="secondary" onclick="closeStatementForm()">RETOUR</button>
+    <div class="error" id="statement-error"></div>
+    <div class="result" id="statement-result"></div>
+  </div>
+
+  <!-- Formulaire pour les documents -->
+  <div id="documents-form" style="display:none;">
+    <h2>📚 DOCUMENTS DE LA COOPEC KWILU</h2>
+    <div style="margin: 20px 0;">
+      <h3>Télécharger les documents officiels :</h3>
+      <div class="docs-block">
+        <h4>Statuts de la Coopec Kwilu</h4>
+        <a href="https://drive.google.com/uc?export=download&id=13ZMbm_0YScZUv4mm-VGh_w7a8k5W4DCH" target="_blank">
+          Télécharger les Statuts (PDF)
+        </a>
+      </div>
+      <div class="docs-block">
+        <h4>Règlement intérieur</h4>
+        <a href="https://drive.google.com/uc?export=download&id=1fptNjPwJPKQf8vZwiD4y_JDV0g-eyn27" target="_blank">
+          Télécharger le Règlement (PDF)
+        </a>
+      </div>
+      <div class="docs-block">
+        <h4>Manuel de procédures</h4>
+        <a href="https://drive.google.com/uc?export=download&id=180L-T4Phi5sToN1Ja9G_ooLzXDEOu2Cs" target="_blank">
+          Télécharger le Manuel (PDF)
+        </a>
+      </div>
+    </div>
+    <button class="secondary" onclick="closeDocumentsForm()">RETOUR</button>
+  </div>
+
+</div>
+
+<script>
+  const url = "https://script.google.com/macros/s/AKfycbzI9HkVNtVc8zuqT5vV3cc2ZRaK3lYTJaZwP_Uy96l_wmRyEUTGcKWsiTxasr8IcAeyZw/exec";
+
+  function sendData() {
+    const code = document.getElementById("code").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorDiv = document.getElementById("error");
+    const resultDiv = document.getElementById("result");
+    const regex = /^[A-Za-z]\d{6}-\d{2}$/;
+
+    errorDiv.style.display = "none";
+    resultDiv.style.display = "none";
+
+    if (!regex.test(code) || password.length !== 5) {
+      errorDiv.style.display = "block";
+      errorDiv.textContent = "⚠️ Format invalide : Code ou mot de passe incorrect";
+      return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("name", password);
+    formData.append("code", code);
+
+    fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      resultDiv.style.display = "block";
+      resultDiv.textContent = data.result || "Réponse vide";
+    })
+    .catch(err => {
+      resultDiv.style.display = "block";
+      resultDiv.textContent = "Erreur : " + err.message;
+    });
+  }
+
+  function sendCreation() {
+    const code = document.getElementById("new-code").value.trim();
+    const password = document.getElementById("new-password").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const errorDiv = document.getElementById("create-error");
+    const resultDiv = document.getElementById("create-result");
+
+    const codeRegex = /^[A-Za-z]\d{6}-\d{2}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    errorDiv.style.display = "none";
+    resultDiv.style.display = "none";
+
+    if (!codeRegex.test(code) || password.length !== 5) {
+      errorDiv.textContent = "⚠️ Format invalide : code ou mot de passe incorrect";
+      errorDiv.style.display = "block";
+      return;
+    }
+
+    if (email && !emailRegex.test(email)) {
+      errorDiv.textContent = "⚠️ Adresse e-mail invalide";
+      errorDiv.style.display = "block";
+      return;
+    }
+
+    const formData = new URLSearchParams();
+    formData.append("code", code);
+    formData.append("password", password);
+    formData.append("email", email);
+
+    fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "error") {
+        errorDiv.textContent = "⚠️ " + data.message;
+        errorDiv.style.display = "block";
+        resultDiv.style.display = "none";
+      } else {
+        resultDiv.textContent = "✅ " + data.message;
+        resultDiv.style.display = "block";
+        errorDiv.style.display = "none";
+
+        document.getElementById("new-code").value = "";
+        document.getElementById("new-password").value = "";
+        document.getElementById("email").value = "";
+      }
+    })
+    .catch(err => {
+      errorDiv.textContent = "⚠️ Erreur technique : " + err.message;
+      errorDiv.style.display = "block";
+      resultDiv.style.display = "none";
+    });
+  }
+
+  function sendStatement() {
+    const code = document.getElementById("statement-code").value.trim();
+    const startDate = document.getElementById("start-date").value;
+    const endDate = document.getElementById("end-date").value;
+    const password = document.getElementById("statement-password").value.trim();
+    const errorDiv = document.getElementById("statement-error");
+    const resultDiv = document.getElementById("statement-result");
+    
+    const codeRegex = /^[A-Za-z]\d{6}-\d{2}$/;
+    
+    errorDiv.style.display = "none";
+    resultDiv.style.display = "none";
+    
+    if (!codeRegex.test(code)) {
+      errorDiv.textContent = "⚠️ Format de compte invalide";
+      errorDiv.style.display = "block";
+      return;
+    }
+    
+    if (!startDate) {
+      errorDiv.textContent = "⚠️ Veuillez sélectionner une date de départ";
+      errorDiv.style.display = "block";
+      return;
+    }
+    
+    if (!endDate) {
+      errorDiv.textContent = "⚠️ Veuillez sélectionner une date de fin";
+      errorDiv.style.display = "block";
+      return;
+    }
+    
+    if (password.length !== 5) {
+      errorDiv.textContent = "⚠️ Le mot de passe doit avoir 5 caractères";
+      errorDiv.style.display = "block";
+      return;
+    }
+    
+    const formData = new URLSearchParams();
+    formData.append("type", "statement");
+    formData.append("code", code);
+    formData.append("start_date", startDate);
+    formData.append("end_date", endDate);
+    formData.append("password", password);
+    
+    fetch(url, {
+      method: "POST",
+      body: formData,
+      headers: { "Content-Type": "application/x-www-form-urlencoded" }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === "error") {
+        errorDiv.textContent = "⚠️ " + data.message;
+        errorDiv.style.display = "block";
+        resultDiv.style.display = "none";
+      } else {
+        resultDiv.textContent = "✅ " + data.message;
+        resultDiv.style.display = "block";
+        errorDiv.style.display = "none";
+        
+        document.getElementById("statement-code").value = "";
+        document.getElementById("start-date").value = "";
+        document.getElementById("end-date").value = "";
+        document.getElementById("end-date").disabled = true;
+        document.getElementById("statement-password").value = "";
+      }
+    })
+    .catch(err => {
+      errorDiv.textContent = "⚠️ Erreur technique : " + err.message;
+      errorDiv.style.display = "block";
+      resultDiv.style.display = "none";
+    });
+  }
+
+  function resetForm() {
+    document.getElementById("code").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("error").style.display = "none";
+    document.getElementById("result").style.display = "none";
+    document.getElementById("result").textContent = "";
+  }
+
+  function openCreateForm() {
+    document.getElementById("main-form").style.display = "none";
+    document.getElementById("create-form").style.display = "block";
+    document.getElementById("statement-form").style.display = "none";
+    document.getElementById("documents-form").style.display = "none";
+    document.getElementById("create-error").style.display = "none";
+    document.getElementById("create-result").style.display = "none";
+    document.getElementById("new-code").value = "";
+    document.getElementById("new-password").value = "";
+    document.getElementById("email").value = "";
+  }
+
+  function closeCreateForm() {
+    document.getElementById("create-form").style.display = "none";
+    document.getElementById("main-form").style.display = "block";
+    document.getElementById("create-error").style.display = "none";
+    document.getElementById("create-result").style.display = "none";
+    document.getElementById("new-code").value = "";
+    document.getElementById("new-password").value = "";
+    document.getElementById("email").value = "";
+  }
+
+  function openStatementForm() {
+    document.getElementById("main-form").style.display = "none";
+    document.getElementById("create-form").style.display = "none";
+    document.getElementById("statement-form").style.display = "block";
+    document.getElementById("documents-form").style.display = "none";
+    document.getElementById("statement-error").style.display = "none";
+    document.getElementById("statement-result").style.display = "none";
+    document.getElementById("statement-code").value = "";
+    document.getElementById("start-date").value = "";
+    document.getElementById("end-date").value = "";
+    document.getElementById("end-date").disabled = true;
+    document.getElementById("statement-password").value = "";
+    
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("start-date").setAttribute('max', today);
+  }
+
+  function closeStatementForm() {
+    document.getElementById("statement-form").style.display = "none";
+    document.getElementById("main-form").style.display = "block";
+    document.getElementById("statement-error").style.display = "none";
+    document.getElementById("statement-result").style.display = "none";
+    document.getElementById("statement-code").value = "";
+    document.getElementById("start-date").value = "";
+    document.getElementById("end-date").value = "";
+    document.getElementById("statement-password").value = "";
+  }
+
+  function openDocumentsForm() {
+    document.getElementById("main-form").style.display = "none";
+    document.getElementById("create-form").style.display = "none";
+    document.getElementById("statement-form").style.display = "none";
+    document.getElementById("documents-form").style.display = "block";
+  }
+
+  function closeDocumentsForm() {
+    document.getElementById("documents-form").style.display = "none";
+    document.getElementById("main-form").style.display = "block";
+  }
+
+  document.getElementById("start-date").addEventListener('change', function() {
+    const startDate = this.value;
+    const endDateInput = document.getElementById("end-date");
+    if (startDate) {
+      endDateInput.disabled = false;
+      endDateInput.setAttribute('min', startDate);
+      const today = new Date().toISOString().split('T')[0];
+      endDateInput.setAttribute('max', today);
+    } else {
+      endDateInput.disabled = true;
+      endDateInput.value = "";
+    }
+  });
+</script>
+</body>
+</html>
