@@ -223,11 +223,60 @@
     padding-right: max(12px, env(safe-area-inset-right));
   }
 }
+/* Styles pour le bouton d'installation */
+#install-button-container {
+  text-align: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--border);
+  margin-bottom: 20px;
+}
+
+#install-button {
+  background: linear-gradient(135deg, #009688, #00796B);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.95em;
+  cursor: pointer;
+  transition: all var(--transition);
+  box-shadow: 0 4px 12px rgba(0, 150, 136, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: auto;
+  margin-top: 0;
+}
+
+#install-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 150, 136, 0.4);
+  background: linear-gradient(135deg, #00796B, #00695C);
+}
   </style>
 </head>
 <body>
 
 <div class="app-container">
+
+  <!-- Formulaire principal -->
+  <div id="main-form">
+    <h2>
+      COOPEC KWILU<br>
+      <span style="font-size:1.01em; font-weight:600;">SOLDE ÉPARGNE MEMBRE</span>
+    </h2>
+    
+    <!-- Ajoutez cette div pour le bouton d'installation -->
+    <div id="install-button-container" style="display: none; margin-bottom: 20px;">
+      <button id="install-button" class="secondary">
+        📱 Installer l'application
+      </button>
+    </div>
+    
+    <label for="code">N° de Compte</label>
+    <input type="text" id="code" placeholder="A123456-78" autocomplete="off" />
+    <!-- ... reste du code existant ... -->
 
   <!-- Formulaire principal -->
   <div id="main-form">
@@ -306,7 +355,6 @@
     </div>
     <button class="secondary" onclick="closeDocumentsForm()">RETOUR</button>
   </div>
-
 </div>
 
 <script>
@@ -564,7 +612,7 @@
     }
   });
 </script>
-  <script>
+ <script>
   // Service Worker Registration
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
@@ -580,31 +628,84 @@
 
   // Installation prompt
   let deferredPrompt;
-  const installButton = document.createElement('button');
-  
+  const installButton = document.getElementById('install-button');
+  const installContainer = document.getElementById('install-button-container');
+
+  // Masquer le bouton initialement
+  if (installContainer) {
+    installContainer.style.display = 'none';
+  }
+
   window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('beforeinstallprompt event fired');
+    
+    // Empêcher l'affichage automatique du prompt
     e.preventDefault();
     deferredPrompt = e;
     
-    // Show custom install button if needed
-    installButton.style.display = 'block';
-    installButton.textContent = '📱 Installer l\'app';
-    installButton.className = 'secondary';
-    installButton.onclick = installApp;
+    // Afficher le bouton d'installation
+    if (installContainer) {
+      installContainer.style.display = 'block';
+      
+      // Animation d'apparition
+      setTimeout(() => {
+        installContainer.style.opacity = '1';
+        installContainer.style.transform = 'translateY(0)';
+      }, 100);
+    }
     
-    document.querySelector('.app-container').appendChild(installButton);
+    // Mettre à jour le texte du bouton
+    if (installButton) {
+      installButton.textContent = '📱 Installer l\'application';
+    }
   });
 
-  function installApp() {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then((choiceResult) => {
-        if (choiceResult.outcome === 'accepted') {
-          console.log('User accepted install');
-          installButton.style.display = 'none';
+  // Gestion du clic sur le bouton d'installation
+  if (installButton) {
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        // L'app est peut-être déjà installée
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          alert('L\'application est déjà installée !');
+          return;
         }
-        deferredPrompt = null;
-      });
+        alert('La fonction d\'installation n\'est pas disponible pour le moment.');
+        return;
+      }
+      
+      // Afficher le prompt d'installation
+      deferredPrompt.prompt();
+      
+      // Attendre la réponse de l'utilisateur
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+        if (installContainer) {
+          installContainer.style.display = 'none';
+        }
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      
+      // Réinitialiser la variable
+      deferredPrompt = null;
+    });
+  }
+
+  // Cacher le bouton si l'app est déjà installée
+  window.addEventListener('appinstalled', (evt) => {
+    console.log('App was successfully installed');
+    if (installContainer) {
+      installContainer.style.display = 'none';
+    }
+    deferredPrompt = null;
+  });
+
+  // Vérifier si l'app est déjà en mode standalone
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+    if (installContainer) {
+      installContainer.style.display = 'none';
     }
   }
 </script>
