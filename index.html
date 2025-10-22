@@ -267,12 +267,14 @@
       <span style="font-size:1.01em; font-weight:600;">SOLDE ÉPARGNE MEMBRE</span>
     </h2>
     
-    <!-- Ajoutez cette div pour le bouton d'installation -->
+     <!-- Bouton d'installation -->
     <div id="install-button-container" style="display: none; margin-bottom: 20px;">
       <button id="install-button" class="secondary">
         📱 Installer l'application
       </button>
     </div>
+    <label for="code">N° de Compte</label>
+    <input type="text" id="code" placeholder="A123456-78" autocomplete="off" />
     <label for="password">Mot de passe</label>
     <input type="password" id="password" maxlength="5" placeholder="5 caractères" autocomplete="off" />
     <button onclick="sendData()">VÉRIFIER LE SOLDE</button>
@@ -599,88 +601,90 @@
     }
   });
 </script>
- <script>
-  // Service Worker Registration
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function(registration) {
-          console.log('Service Worker registered with scope:', registration.scope);
-        })
-        .catch(function(error) {
-          console.log('Service Worker registration failed:', error);
-        });
-    });
-  }
-
-  // Installation prompt
-  let deferredPrompt;
+<script>
+// Service Worker et PWA Installation
+document.addEventListener('DOMContentLoaded', function() {
   const installButton = document.getElementById('install-button');
   const installContainer = document.getElementById('install-button-container');
-
-  // Masquer le bouton initialement
-  if (installContainer) {
-    installContainer.style.display = 'none';
+  
+  // Vérifier si l'app est déjà installée
+  function isAppInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || 
+           window.navigator.standalone === true;
   }
-
+  
+  // Masquer le bouton si déjà installé
+  if (isAppInstalled() && installContainer) {
+    installContainer.style.display = 'none';
+    console.log('App already installed');
+  }
+  
+  // Service Worker Registration
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('SW registered: ', registration);
+      })
+      .catch(function(error) {
+        console.log('SW registration failed: ', error);
+      });
+  }
+  
+  // Gestion de l'installation PWA
+  let deferredPrompt;
+  
   window.addEventListener('beforeinstallprompt', (e) => {
     console.log('beforeinstallprompt event fired');
     
-    // Empêcher l'affichage automatique du prompt
+    // Empêcher le prompt automatique
     e.preventDefault();
     deferredPrompt = e;
     
     // Afficher le bouton d'installation
-    if (installContainer) {
+    if (installContainer && !isAppInstalled()) {
       installContainer.style.display = 'block';
+      installContainer.style.opacity = '0';
+      installContainer.style.transition = 'opacity 0.3s ease';
       
-      // Animation d'apparition
       setTimeout(() => {
         installContainer.style.opacity = '1';
-        installContainer.style.transform = 'translateY(0)';
       }, 100);
     }
-    
-    // Mettre à jour le texte du bouton
-    if (installButton) {
-      installButton.textContent = '📱 Installer l\'application';
-    }
   });
-
+  
   // Gestion du clic sur le bouton d'installation
   if (installButton) {
     installButton.addEventListener('click', async () => {
       if (!deferredPrompt) {
-        // L'app est peut-être déjà installée
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-          alert('L\'application est déjà installée !');
-          return;
+        if (isAppInstalled()) {
+          alert('L\'application est déjà installée sur votre appareil.');
+        } else {
+          alert('L\'installation n\'est pas disponible pour le moment. Revenez plus tard.');
         }
-        alert('La fonction d\'installation n\'est pas disponible pour le moment.');
         return;
       }
       
       // Afficher le prompt d'installation
       deferredPrompt.prompt();
       
-      // Attendre la réponse de l'utilisateur
+      // Attendre le choix de l'utilisateur
       const { outcome } = await deferredPrompt.userChoice;
       
+      console.log(`User response to the install prompt: ${outcome}`);
+      
       if (outcome === 'accepted') {
-        console.log('User accepted the install prompt');
+        // Cacher le bouton après installation
         if (installContainer) {
           installContainer.style.display = 'none';
         }
-      } else {
-        console.log('User dismissed the install prompt');
       }
       
-      // Réinitialiser la variable
+      // Nettoyer
       deferredPrompt = null;
     });
   }
-
-  // Cacher le bouton si l'app est déjà installée
+  
+  // Cacher le bouton après installation réussie
   window.addEventListener('appinstalled', (evt) => {
     console.log('App was successfully installed');
     if (installContainer) {
@@ -688,13 +692,13 @@
     }
     deferredPrompt = null;
   });
-
-  // Vérifier si l'app est déjà en mode standalone
-  if (window.matchMedia('(display-mode: standalone)').matches) {
-    if (installContainer) {
-      installContainer.style.display = 'none';
-    }
-  }
+  
+  // Debug: Vérifier les conditions PWA
+  console.log('PWA Support Check:');
+  console.log('- Service Worker:', 'serviceWorker' in navigator);
+  console.log('- BeforeInstallPrompt:', 'BeforeInstallPromptEvent' in window);
+  console.log('- App Installed:', isAppInstalled());
+});
 </script>
 </body>
 </html>
